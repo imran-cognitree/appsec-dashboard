@@ -1,4 +1,4 @@
-## Server-Sent Events (NEW)
+## Server-Sent Events
 1. We click the Generate Report button, and the below hook gets invoked
     - [useGenerateReport hook](/frontend/src/hooks/useReports.ts)
 2. Keeps the taskId in localstorage and sets the query key with taskId and status. Which in turn invokes the below hook, which opens up the SSE connection
@@ -25,6 +25,10 @@ After running `git commit`
 
 [Pre-commit](.husky/pre-commit)  
 [RBAC Test](frontend/src/rbac.test.tsx)
+
+## RBAC Tests
+- [rbac.test.tsx](frontend/src/rbac.test.tsx)
+- [App.tsx](frontend/src/App.tsx)
 
 ## PR Gates
 - **Tools:** GitHub Actions, Playwright.
