@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import close_database_connection
-from app.routes import auth_routes, findings_routes, reports_routes
+from app.routes import auth_routes, datasets_routes, findings_routes, reports_routes
 
 app = FastAPI(title="Vulnerability Dashboard API")
 
@@ -27,6 +27,7 @@ async def shutdown_db_client():
 app.include_router(auth_routes.router, prefix="/api")
 app.include_router(findings_routes.router, prefix="/api")
 app.include_router(reports_routes.router, prefix="/api")
+app.include_router(datasets_routes.router, prefix="/api")
 
 @app.get("/")
 def read_root():

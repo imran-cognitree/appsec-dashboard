@@ -1,0 +1,21 @@
+timestamp,event,severity,user,ip_address,description
+2026-10-21T03:00:01Z,AUTH_LOGIN_SUCCESS,INFO,admin,192.168.1.10,Admin authenticated via MFA session token
+2026-10-21T03:00:12Z,PORT_SCAN_DETECTED,HIGH,system,10.0.4.155,Rapid sequential probe detected across ports 20-1024
+2026-10-21T03:01:05Z,SQLI_ATTEMPT_BLOCKED,CRITICAL,anonymous,203.0.113.42,WAF intercepted union-based injection payload
+2026-10-21T03:01:45Z,CONFIG_CHANGED,MEDIUM,secops_lead,192.168.1.22,Updated ingress CORS policy on production cluster
+2026-10-21T03:02:18Z,TOKEN_REFRESH,INFO,analyst_01,192.168.2.88,JWT session token refreshed successfully
+2026-10-21T03:03:00Z,RATE_LIMIT_EXCEEDED,LOW,api_client_9,198.51.100.14,Hit 120 req/min threshold on /api/findings
+2026-10-21T03:03:30Z,FILE_INTEGRITY_ALERT,HIGH,daemon_agent,10.0.1.12,SHA-256 hash mismatch detected on /etc/shadow.bak
+2026-10-21T03:04:15Z,SSH_LOGIN_ATTEMPT,MEDIUM,root,198.51.100.77,Failed root SSH attempt rejected by key constraint
+2026-10-21T03:05:02Z,PRIVILEGE_ESCALATION,CRITICAL,service_worker,10.0.2.5,Unprivileged container attempted CAP_SYS_ADMIN mount
+2026-10-21T03:05:40Z,DATASET_EXPORTED,INFO,admin,192.168.1.10,Exported security findings report for Q3 compliance
+2026-10-21T03:06:11Z,XSS_PAYLOAD_FILTERED,MEDIUM,guest_tester,203.0.113.99,Sanitized script tag in finding description query
+2026-10-21T03:07:05Z,TLS_CERT_WARNING,LOW,cert_watcher,10.0.0.1,Wildcard TLS certificate expires in 14 days
+2026-10-21T03:07:44Z,DATABASE_BACKUP_INIT,INFO,cron_backup,10.0.3.1,Scheduled snapshot of MongoDB findings collection started
+2026-10-21T03:08:19Z,DATABASE_BACKUP_SUCCESS,INFO,cron_backup,10.0.3.1,Snapshot completed in 35 seconds (1.2 GB stored)
+2026-10-21T03:09:00Z,SESSION_TIMEOUT,INFO,analyst_02,192.168.2.14,Inactive session closed after 30 minutes of idle time
+2026-10-21T03:09:55Z,API_KEY_REVOKED,MEDIUM,admin,192.168.1.10,Revoked legacy Jenkins deployment token
+2026-10-21T03:10:20Z,BRUTE_FORCE_DETECTED,HIGH,scanner_bot,198.51.100.201,15 failed login attempts in 10 seconds against /api/auth/login
+2026-10-21T03:11:05Z,IP_BLACKLISTED,HIGH,firewall_service,10.0.0.2,Blocked 198.51.100.201 on edge security group
+2026-10-21T03:12:12Z,VULNERABILITY_FIXED,INFO,admin,192.168.1.10,Marked CVE-2024-45321 status as RESOLVED
+2026-10-21T03:13:00Z,HEALTHCHECK_PING,INFO,cluster_monitor,10.0.0.254,All Kubernetes node pods reporting healthy state
