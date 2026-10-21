@@ -11,22 +11,26 @@ import {
   Database,
   Terminal,
 } from 'lucide-react';
-import { uploadDataset, streamDatasetContent } from '../../lib/api';
-import type { DatasetUploadResult } from '../../lib/api';
+import { useStreamStore } from '../../store/streamStore';
 import './DataStreamDemo.css';
 
 export function DataStreamDemo() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadedDataset, setUploadedDataset] = useState<DatasetUploadResult | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [streamedContent, setStreamedContent] = useState('');
-  const [bytesReceived, setBytesReceived] = useState(0);
-  const [chunkCount, setChunkCount] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const abortControllerRef = useRef<AbortController | null>(null);
+  // Global persistent streaming state from Zustand
+  const uploadedDataset = useStreamStore((s) => s.uploadedDataset);
+  const isUploading = useStreamStore((s) => s.isUploading);
+  const isStreaming = useStreamStore((s) => s.isStreaming);
+  const streamedContent = useStreamStore((s) => s.streamedContent);
+  const bytesReceived = useStreamStore((s) => s.bytesReceived);
+  const chunkCount = useStreamStore((s) => s.chunkCount);
+  const isComplete = useStreamStore((s) => s.isComplete);
+  const errorMessage = useStreamStore((s) => s.errorMessage);
+
+  const upload = useStreamStore((s) => s.upload);
+  const startStream = useStreamStore((s) => s.startStream);
+  const stopStream = useStreamStore((s) => s.stopStream);
+
   const terminalRef = useRef<HTMLPreElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -37,80 +41,18 @@ export function DataStreamDemo() {
     }
   }, [streamedContent, isStreaming]);
 
-  // Clean up any ongoing stream on unmount
-  useEffect(() => {
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
-  }, []);
-
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
-      setUploadedDataset(null);
-      setStreamedContent('');
-      setBytesReceived(0);
-      setChunkCount(0);
-      setIsComplete(false);
-      setErrorMessage(null);
     }
   };
 
   const handleUpload = async () => {
     if (!selectedFile) return;
-
     try {
-      setIsUploading(true);
-      setErrorMessage(null);
-      const result = await uploadDataset(selectedFile);
-      setUploadedDataset(result);
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to upload dataset.');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleStartStream = async () => {
-    if (!uploadedDataset) return;
-
-    setStreamedContent('');
-    setBytesReceived(0);
-    setChunkCount(0);
-    setIsComplete(false);
-    setErrorMessage(null);
-    setIsStreaming(true);
-
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
-    try {
-      await streamDatasetContent(uploadedDataset.id, {
-        signal: controller.signal,
-        onChunk: (chunkText, bytes) => {
-          setStreamedContent((prev) => prev + chunkText);
-          setBytesReceived(bytes);
-          setChunkCount((prev) => prev + 1);
-        },
-      });
-      setIsComplete(true);
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setErrorMessage('Stream cancelled by user.');
-      } else {
-        setErrorMessage(err.message || 'Stream connection failed.');
-      }
-    } finally {
-      setIsStreaming(false);
-      abortControllerRef.current = null;
-    }
-  };
-
-  const handleStopStream = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
+      await upload(selectedFile);
+    } catch {
+      // Error handled in store
     }
   };
 
@@ -162,7 +104,7 @@ export function DataStreamDemo() {
           </button>
 
           <span className="stream-demo__filename">
-            {selectedFile ? selectedFile.name : 'No file chosen (CSV, JSON, or TXT)'}
+            {selectedFile ? selectedFile.name : (uploadedDataset ? uploadedDataset.filename : 'No file chosen (CSV, JSON, or TXT)')}
           </span>
 
           <button
@@ -201,7 +143,7 @@ export function DataStreamDemo() {
                 type="button"
                 id="btn-start-stream"
                 className="stream-demo__btn stream-demo__btn--accent"
-                onClick={handleStartStream}
+                onClick={startStream}
               >
                 <Play size={15} />
                 Start Stream Download
@@ -211,7 +153,7 @@ export function DataStreamDemo() {
                 type="button"
                 id="btn-stop-stream"
                 className="stream-demo__btn stream-demo__btn--danger"
-                onClick={handleStopStream}
+                onClick={stopStream}
               >
                 <Square size={14} />
                 Stop Stream
