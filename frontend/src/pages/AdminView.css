@@ -12,7 +12,8 @@
   align-items: center;
   gap: var(--space-xl);
   text-align: center;
-  max-width: 600px;
+  max-width: 680px;
+  width: 100%;
 }
 
 .admin-view__icon-box {
