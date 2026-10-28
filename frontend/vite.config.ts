@@ -4,10 +4,14 @@ import { defineConfig } from 'vite'
 
 import { configDefaults } from 'vitest/config'
 import { playwright } from '@vitest/browser-playwright'
+import { compression } from 'vite-plugin-compression2';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    compression({ algorithms: ['gzip', 'brotliCompress'] }),
+  ],
   test: {
     browser: {
       enabled: true,

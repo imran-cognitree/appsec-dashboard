@@ -1,17 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Shield, LayoutDashboard, SquareTerminal, Zap, List, Cable, LogOut } from 'lucide-react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useDashboardStore } from './store/dashboardStore';
 import { VulnerabilityOverview } from './components/dashboard/VulnerabilityOverview';
 import { FindingsList } from './components/dashboard/FindingsList';
 import { LoginPage } from './pages/LoginPage';
-import { AdminView } from './pages/AdminView';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { queryClient } from './lib/queryClient';
 import { isLoggedIn, clearToken, isAdmin } from './lib/api';
 import type { ScanType, Severity } from './store/types';
 import './styles/index.css';
 import './App.css';
+
+const AdminView = lazy(() =>
+  import('./pages/AdminView').then((m) => ({ default: m.AdminView }))
+);
 
 type View = 'overview' | ScanType | 'all' | 'admin';
 
@@ -158,7 +161,9 @@ function AppContent() {
           {activeView === 'overview' ? (
             <VulnerabilityOverview onViewFindings={handleViewFindings} />
           ) : activeView === 'admin' ? (
-            <AdminView />
+            <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center', color: 'var(--on-surface-variant)' }}>Loading Admin Control Panel…</div>}>
+              <AdminView />
+            </Suspense>
           ) : (
             <FindingsList scanType={activeView} onBack={handleBack} isAdmin={isAdminUser} />
           )}
