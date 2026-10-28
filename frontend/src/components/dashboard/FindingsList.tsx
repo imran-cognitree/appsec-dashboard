@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { ChevronLeft, Loader2, ArrowUp, ArrowDown, Trash2, Pencil, AlertCircle, RefreshCw } from 'lucide-react';
+import { ChevronLeft, Loader2, ArrowUp, ArrowDown, Trash2, Pencil, AlertCircle, RefreshCw, Download } from 'lucide-react';
 import { useInfiniteFindings, useDeleteFinding, useUpdateFinding } from '../../hooks/useFindings';
 import { useDashboardStore } from '../../store/dashboardStore';
 import { SeverityBadge } from '../ui/SeverityBadge';
@@ -8,6 +8,7 @@ import { FilterDropdown } from '../ui/FilterDropdown';
 import { SearchInput } from '../ui/SearchInput';
 import { FindingDetailPanel } from './FindingDetailPanel';
 import { Modal } from '../ui/Modal';
+import { exportFindingsToCsv } from '../../utils/csvExport';
 import type { ScanType, Finding } from '../../store/types';
 import './FindingsList.css';
 
@@ -198,6 +199,12 @@ export function FindingsList({ scanType, onBack, isAdmin = false }: Props) {
     return () => observer.disconnect();
   }, [handleIntersection]);
 
+  const handleExportCsv = useCallback(() => {
+    if (displayedFindings.length === 0) return;
+    const date = new Date().toISOString().split('T')[0];
+    exportFindingsToCsv(displayedFindings, `findings-${scanType}-${date}.csv`);
+  }, [displayedFindings, scanType]);
+
   const colCount = scanType === 'all' ? (isAdmin ? 11 : 10) : (isAdmin ? 10 : 9);
 
   return (
@@ -261,9 +268,22 @@ export function FindingsList({ scanType, onBack, isAdmin = false }: Props) {
               onChange={(v) => setPageSize(Number(v))}
             />
           </div>
-          <span className="findings__count">
-            Showing <strong>{displayedFindings.length}</strong> of <strong>{totalCount}</strong> findings
-          </span>
+          <div className="findings__actions">
+            <span className="findings__count">
+              Showing <strong>{displayedFindings.length}</strong> of <strong>{totalCount}</strong> findings
+            </span>
+            <button
+              id="findings-export-csv"
+              type="button"
+              className="findings__export-btn"
+              onClick={handleExportCsv}
+              disabled={displayedFindings.length === 0}
+              title={displayedFindings.length === 0 ? 'No findings to export' : `Export ${displayedFindings.length} findings to CSV`}
+            >
+              <Download size={14} />
+              <span>Export CSV</span>
+            </button>
+          </div>
         </div>
 
         {/* Error state */}

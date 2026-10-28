@@ -318,12 +318,48 @@
   font-size: 14px;
 }
 
-/* Findings count (toolbar right side) */
+/* Findings actions & count (toolbar right side) */
+.findings__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-base);
+  flex-wrap: wrap;
+}
+
 .findings__count {
   font-size: 12px;
   font-family: var(--font-mono);
   color: var(--on-surface-variant);
   white-space: nowrap;
+}
+
+.findings__export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--scanner-sca);
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  white-space: nowrap;
+}
+
+.findings__export-btn:hover:not(:disabled) {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: rgba(6, 182, 212, 0.5);
+  transform: translateY(-1px);
+}
+
+.findings__export-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Invisible sentinel for IntersectionObserver */
