@@ -24,6 +24,7 @@
 
 ### RBAC Tests
 - [rbac.test.tsx](frontend/src/rbac.test.tsx)
+- [App.tsx](frontend/src/App.tsx)
 
 
 ## Unit and Integration Tests

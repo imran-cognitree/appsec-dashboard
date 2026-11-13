@@ -1,5 +1,6 @@
 import { Shield } from 'lucide-react';
 import { ReportGenerator } from '../components/dashboard/ReportGenerator';
+import { DataStreamDemo } from '../components/dashboard/DataStreamDemo';
 import './AdminView.css';
 
 export function AdminView() {
@@ -11,7 +12,7 @@ export function AdminView() {
         </div>
         <h1 className="admin-view__title">Admin Control Panel</h1>
         <p className="admin-view__description">
-          RBAC Demo: This page is accessible only to ADMIN users. 
+          RBAC Demo: This page is accessible only to ADMIN users.
           You can manage findings, delete vulnerabilities, and perform administrative tasks.
         </p>
         <div className="admin-view__features">
@@ -33,10 +34,15 @@ export function AdminView() {
           </div>
         </div>
 
-        {/* ── Report Generation Section ── */}
+        {/* ── Report Generation Section (SSE Demo) ── */}
         <div className="admin-view__divider" />
-        <div className="admin-view__section-label">Actions</div>
+        <div className="admin-view__section-label">Server-Sent Events</div>
         <ReportGenerator />
+
+        {/* ── Dataset Streaming Section (HTTP Chunked Stream Demo) ── */}
+        <div className="admin-view__divider" />
+        <div className="admin-view__section-label">Streaming Response</div>
+        <DataStreamDemo />
       </div>
     </div>
   );

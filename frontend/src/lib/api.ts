@@ -247,3 +247,88 @@ export function subscribeToReportStream(
   return () => es.close();
 }
 
+// Datasets Streaming API
+export interface DatasetUploadResult {
+  id: string;
+  filename: string;
+}
+
+export async function uploadDataset(file: File): Promise<DatasetUploadResult> {
+  const token = getStoredToken();
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE}/datasets`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
+    throw new Error(error.detail || `Upload failed: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function streamDatasetContent(
+  datasetId: string,
+  callbacks: {
+    onChunk: (chunkText: string, bytesReceived: number) => void;
+    signal?: AbortSignal;
+  },
+): Promise<string> {
+  const token = getStoredToken();
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE}/datasets/${datasetId}/content`, {
+    method: 'GET',
+    headers,
+    signal: callbacks.signal,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ detail: 'Streaming failed' }));
+    throw new Error(error.detail || `Streaming failed: ${response.statusText}`);
+  }
+
+  if (!response.body) {
+    throw new Error('ReadableStream not supported on this response body');
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let accumulatedText = '';
+  let bytesReceived = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      bytesReceived += value.byteLength;
+      const textChunk = decoder.decode(value, { stream: true });
+      accumulatedText += textChunk;
+      callbacks.onChunk(textChunk, bytesReceived);
+    }
+    const remainder = decoder.decode();
+    if (remainder) {
+      accumulatedText += remainder;
+      callbacks.onChunk(remainder, bytesReceived);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  return accumulatedText;
+}
+
